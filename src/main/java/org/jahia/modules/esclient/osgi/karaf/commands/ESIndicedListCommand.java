@@ -13,11 +13,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-@Command(scope = "es", name = "indices-list", description = "Lists the ES indexes")
+@Command(scope = "es", name = "indices-list", description = "Lists the ES indices")
 @Service
-public class ESIndexManagerCommand implements Action {
+public class ESIndicedListCommand implements Action {
 
-    private static final Logger logger = LoggerFactory.getLogger(ESIndexManagerCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ESIndicedListCommand.class);
 
     @Override
     public Object execute() throws Exception {
