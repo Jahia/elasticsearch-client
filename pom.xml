@@ -67,9 +67,20 @@
     </properties>
 
     <scm>
-        <connection>scm:dummy:uri</connection>
-        <developerConnection>scm:dummy:uri</developerConnection>
+        <connection>scm:git:git@github.com:Jahia/elasticsearch-client</connection>
+        <developerConnection>scm:git:git@github.com:Jahia/elasticsearch-client</developerConnection>
     </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>ps-releases</id>
+            <url>https://devtools.jahia.com/nexus/content/repositories/jahia-professional-services-public-repository</url>
+        </repository>
+        <snapshotRepository>
+            <id>ps-snapshots</id>
+            <url>https://devtools.jahia.com/nexus/content/repositories/jahia-professional-services-public-repository</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <repositories>
         <repository>
