@@ -3,6 +3,7 @@ package org.jahia.modules.esclient.services;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetIndexRequest;
@@ -123,5 +124,19 @@ public class ESService {
         info.put("Task max waiting time", response.getTaskMaxWaitingTime().toHumanReadableString(3));
 
         return info;
+    }
+
+    public boolean removeIndex(String index) {
+        try {
+            if (elasticSearchClient.indices().exists(new GetIndexRequest(index), RequestOptions.DEFAULT)) {
+                elasticSearchClient.indices().delete(new DeleteIndexRequest(index), RequestOptions.DEFAULT);
+                return true;
+            }
+            logger.warn("Index {} doesn't exist anymore", index);
+            return false;
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+            return false;
+        }
     }
 }

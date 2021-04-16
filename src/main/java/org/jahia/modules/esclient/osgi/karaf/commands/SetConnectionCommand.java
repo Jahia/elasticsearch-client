@@ -19,7 +19,7 @@ public class SetConnectionCommand extends AbstractESCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(SetConnectionCommand.class);
 
-    @Argument(description = "Connection ID. If not specified, the available connections are listed", required = false)
+    @Argument(description = "Connection ID. If not specified, the available connections are listed")
     @Completion(ConnectionIDCompleter.class)
     private String connection;
 
