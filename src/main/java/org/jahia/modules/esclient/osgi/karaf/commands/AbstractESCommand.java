@@ -30,7 +30,9 @@ public abstract class AbstractESCommand implements Action {
     }
 
     protected ESService getESService() {
-        return BundleUtils.getOsgiService(ESService.class, null);
+        final ESService service = BundleUtils.getOsgiService(ESService.class, null);
+        if (service == null || !service.isClientActive()) saveNoConnection();
+        return service;
     }
 
     protected boolean noConnectionDefined() {

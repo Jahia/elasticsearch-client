@@ -19,9 +19,7 @@ public class ESIndicedListCommand extends AbstractESCommand {
 
     @Override
     public Object execute() throws Exception {
-        if (noConnectionDefined()) {
-            return null;
-        }
+        if (noConnectionDefined()) return null;
 
         final ESService esService = getESService();
         final Map<String, String> indexes = esService.listIndices();
