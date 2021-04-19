@@ -13,9 +13,9 @@ import java.util.Map;
 
 @Command(scope = "es", name = "indices-list", description = "Lists the ES indices")
 @Service
-public class ESIndicedListCommand extends AbstractESCommand {
+public class ESIndicesListCommand extends AbstractESCommand {
 
-    private static final Logger logger = LoggerFactory.getLogger(ESIndicedListCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(ESIndicesListCommand.class);
 
     @Override
     public Object execute() throws Exception {
