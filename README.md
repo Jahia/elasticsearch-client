@@ -96,3 +96,14 @@ Displays the ES cluster health information.
     Number Of In Flight Fetch | 0
     Number Of Pending Tasks   | 0
     Task Max Waiting Time     | 0s
+
+## <a name="faq"></a>FAQ
+### How to use in the tools?
+The commands rely on the Karaf session to store the current connection. As a consequence, it is 
+required to chain the commands in a single request when running them from the Jahia Tools.
+
+**Examples:**
+
+    es:connection jahia-as ; es:indices-list    
+    es:connection jahia-as ; es:indices-delete *   
+    es:connection jahia-as ; es:indices-cluster-health   
