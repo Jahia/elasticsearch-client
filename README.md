@@ -98,7 +98,7 @@ Displays the ES cluster health information.
     Task Max Waiting Time     | 0s
 
 ## <a name="faq"></a>FAQ
-### How to use in the tools?
+### <a name="faq-tools"></a>How to use from the tools?
 The commands rely on the Karaf session to store the current connection. As a consequence, it is 
 required to chain the commands in a single request when running them from the Jahia Tools.
 
