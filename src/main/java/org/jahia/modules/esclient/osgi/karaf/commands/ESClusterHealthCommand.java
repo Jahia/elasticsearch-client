@@ -3,7 +3,6 @@ package org.jahia.modules.esclient.osgi.karaf.commands;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.table.Col;
-import org.apache.karaf.shell.support.table.Row;
 import org.apache.karaf.shell.support.table.ShellTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

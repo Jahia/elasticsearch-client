@@ -5,7 +5,6 @@ import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.jahia.modules.esclient.osgi.karaf.completers.ConnectionIDCompleter;
 import org.jahia.modules.esclient.osgi.karaf.completers.IndicesCompleter;
 import org.jahia.modules.esclient.services.ESService;
 import org.slf4j.Logger;
