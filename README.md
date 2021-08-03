@@ -106,4 +106,4 @@ required to chain the commands in a single request when running them from the Ja
 
     es:connection jahia-as ; es:indices-list    
     es:connection jahia-as ; es:indices-delete *   
-    es:connection jahia-as ; es:indices-cluster-health   
+    es:connection jahia-as ; es:cluster-health   
