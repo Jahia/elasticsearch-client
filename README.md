@@ -1,7 +1,7 @@
 # Elasticsearch Client
 
 Jahia module that provides commands to administrate an Elasticsearch server to which your Jahia server is connected
-through the `database-connector` & `elasticsearch-connector-7` modules.
+through the `database-connector` & `elasticsearch-connector` modules.
 
 ## <a name="how-to-use"></a>How to use?
 ### <a name="es-connection"></a>es:connection

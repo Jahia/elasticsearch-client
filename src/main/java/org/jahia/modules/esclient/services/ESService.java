@@ -8,10 +8,10 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.GetIndexResponse;
-import org.elasticsearch.cluster.metadata.AliasMetaData;
+import org.elasticsearch.cluster.metadata.AliasMetadata;
 import org.jahia.modules.databaseConnector.services.ConnectionService;
-import org.jahia.modules.elasticsearchconnector7.connection.ElasticSearchConnection;
-import org.jahia.modules.elasticsearchconnector7.connection.ElasticSearchConnectionRegistry;
+import org.jahia.modules.elasticsearchconnector.connection.ElasticSearchConnection;
+import org.jahia.modules.elasticsearchconnector.connection.ElasticSearchConnectionRegistry;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -76,14 +76,14 @@ public class ESService {
 
             final GetIndexResponse response = elasticSearchClient.indices().get(new GetIndexRequest("*"), RequestOptions.DEFAULT);
             final String[] indices = response.getIndices();
-            final Map<String, List<AliasMetaData>> aliases = response.getAliases();
+            final Map<String, List<AliasMetadata>> aliases = response.getAliases();
             final Map<String, String> indicesMap = new HashMap<>(indices.length);
             for (String index : indices) {
                 if (!aliases.containsKey(index))
                     indicesMap.put(index, null);
                 else {
                     StringBuilder sb = new StringBuilder();
-                    for (AliasMetaData aliasMetaData : aliases.get(index)) {
+                    for (AliasMetadata aliasMetaData : aliases.get(index)) {
                         sb.append(" , ").append(aliasMetaData.getAlias());
                     }
                     indicesMap.put(index, StringUtils.substring(sb.toString(), 3));
