@@ -4,11 +4,19 @@ import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.search.ClearScrollRequest;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.GetIndexResponse;
 import org.elasticsearch.cluster.metadata.AliasMetadata;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.jahia.modules.databaseConnector.services.ConnectionService;
 import org.jahia.modules.elasticsearchconnector.connection.ElasticSearchConnection;
 import org.jahia.modules.elasticsearchconnector.connection.ElasticSearchConnectionRegistry;
@@ -22,10 +30,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Component(service = ESService.class, immediate = true)
 public class ESService {
@@ -138,5 +148,46 @@ public class ESService {
             logger.error(e.getMessage(), e);
             return false;
         }
+    }
+
+    public Map<String, String> getIndexContent(String esIndex)
+            throws IOException {
+        if (!elasticSearchClient.indices().exists(new GetIndexRequest(esIndex), RequestOptions.DEFAULT)) {
+            logger.warn(String.format("The index %s doesn't exist", esIndex));
+            return Collections.emptyMap();
+        }
+
+        final Map<String, String> data = new HashMap<>();
+        final TimeValue timeValue = new TimeValue(5, TimeUnit.MINUTES);
+        final SearchSourceBuilder sourceBuilder = SearchSourceBuilder.searchSource()
+                .query(QueryBuilders.matchAllQuery())
+                .size(100);
+        final SearchRequest searchRequest = new SearchRequest(esIndex);
+        searchRequest.source(sourceBuilder).scroll(timeValue);
+        SearchResponse searchResponse;
+        final List<String> scrollIds = new LinkedList<>();
+        try {
+            searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
+            do {
+                for (SearchHit hit : searchResponse.getHits()) {
+                    data.put(hit.getId(), hit.getSourceAsString());
+                }
+                final SearchScrollRequest scrollRequest = new SearchScrollRequest();
+                scrollRequest.scrollId(searchResponse.getScrollId());
+                scrollRequest.scroll(timeValue);
+                scrollIds.add(searchResponse.getScrollId());
+                searchResponse = elasticSearchClient.scroll(scrollRequest, RequestOptions.DEFAULT);
+            }
+            // Zero hits mark the end of the scroll and the while loop.
+            while (searchResponse.getHits().getHits().length != 0);
+            scrollIds.add(searchResponse.getScrollId());
+            final ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
+            clearScrollRequest.setScrollIds(scrollIds);
+            elasticSearchClient.clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            logger.error("Error while updating categories: {}", e.getMessage(), e);
+        }
+
+        return data;
     }
 }
