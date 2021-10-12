@@ -53,7 +53,7 @@
     </parent>
     <artifactId>elasticsearch-client</artifactId>
     <name>Elasticsearch Client</name>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     <packaging>bundle</packaging>
     <description>This is the custom module (Elasticsearch Client) for running on a Jahia server.</description>
 
@@ -66,7 +66,7 @@
     <scm>
         <connection>scm:git:git@github.com:Jahia/elasticsearch-client</connection>
         <developerConnection>scm:git:git@github.com:Jahia/elasticsearch-client</developerConnection>
-      <tag>HEAD</tag>
+      <tag>elasticsearch-client-1.2</tag>
   </scm>
 
     <distributionManagement>
