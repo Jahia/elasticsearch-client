@@ -14,6 +14,7 @@ import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.GetIndexResponse;
 import org.elasticsearch.cluster.metadata.AliasMetadata;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -26,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -171,6 +173,48 @@ public class ESService {
             do {
                 for (SearchHit hit : searchResponse.getHits()) {
                     data.put(hit.getId(), hit.getSourceAsString());
+                }
+                final SearchScrollRequest scrollRequest = new SearchScrollRequest();
+                scrollRequest.scrollId(searchResponse.getScrollId());
+                scrollRequest.scroll(timeValue);
+                scrollIds.add(searchResponse.getScrollId());
+                searchResponse = elasticSearchClient.scroll(scrollRequest, RequestOptions.DEFAULT);
+            }
+            // Zero hits mark the end of the scroll and the while loop.
+            while (searchResponse.getHits().getHits().length != 0);
+            scrollIds.add(searchResponse.getScrollId());
+            final ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
+            clearScrollRequest.setScrollIds(scrollIds);
+            elasticSearchClient.clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            logger.error("Error while querying the index: {}", e.getMessage(), e);
+        }
+
+        return data;
+    }
+
+    public List<String> getHits(String esIndex, Map<String,String> filters)
+            throws IOException {
+        if (!elasticSearchClient.indices().exists(new GetIndexRequest(esIndex), RequestOptions.DEFAULT)) {
+            logger.warn(String.format("The index %s doesn't exist", esIndex));
+            return Collections.emptyList();
+        }
+
+        final List<String> data = new ArrayList<>();
+        final TimeValue timeValue = new TimeValue(5, TimeUnit.MINUTES);
+        final SearchSourceBuilder sourceBuilder = SearchSourceBuilder.searchSource().size(100);
+        final BoolQueryBuilder query = QueryBuilders.boolQuery();
+        filters.forEach((key, value) -> query.must(QueryBuilders.matchQuery(key, value)));
+        sourceBuilder.query(query);
+        final SearchRequest searchRequest = new SearchRequest(esIndex);
+        searchRequest.source(sourceBuilder).scroll(timeValue);
+        SearchResponse searchResponse;
+        final List<String> scrollIds = new LinkedList<>();
+        try {
+            searchResponse = elasticSearchClient.search(searchRequest, RequestOptions.DEFAULT);
+            do {
+                for (SearchHit hit : searchResponse.getHits()) {
+                    data.add(hit.getSourceAsString());
                 }
                 final SearchScrollRequest scrollRequest = new SearchScrollRequest();
                 scrollRequest.scrollId(searchResponse.getScrollId());
