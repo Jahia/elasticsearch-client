@@ -22,7 +22,7 @@ public class ESIndexViewCommand extends AbstractESCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(ESIndexViewCommand.class);
 
-    @Argument(description = "Indices to delete", required = true)
+    @Argument(description = "Index to use", required = true)
     @Completion(IndicesCompleter.class)
     String index;
 

@@ -185,7 +185,7 @@ public class ESService {
             clearScrollRequest.setScrollIds(scrollIds);
             elasticSearchClient.clearScroll(clearScrollRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
-            logger.error("Error while updating categories: {}", e.getMessage(), e);
+            logger.error("Error while querying the index: {}", e.getMessage(), e);
         }
 
         return data;
