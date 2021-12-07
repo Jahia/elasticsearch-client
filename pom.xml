@@ -49,18 +49,19 @@
     <parent>
         <artifactId>jahia-modules</artifactId>
         <groupId>org.jahia.modules</groupId>
-        <version>7.3.0.0</version>
+        <version>8.0.2.0</version>
     </parent>
     <artifactId>elasticsearch-client</artifactId>
     <name>Elasticsearch Client</name>
-    <version>1.4-SNAPSHOT</version>
+    <version>2.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <description>This is the custom module (Elasticsearch Client) for running on a Jahia server.</description>
 
     <properties>
         <jahia-depends>default,database-connector,elasticsearch-connector</jahia-depends>
-        <database-connector.version>1.2.0</database-connector.version>
-        <elasticsearch-connector.version>2.0.0</elasticsearch-connector.version>
+        <database-connector.version>1.3.0</database-connector.version>
+        <elasticsearch-connector.version>3.0.0</elasticsearch-connector.version>
+        <jahia-module-signature>MCwCFDgXd1wXamOXbGWVauGo/08eCDq3AhRFYEqbG/LKNo2NG1Gnb8h6eQDZNw==</jahia-module-signature>
     </properties>
 
     <scm>
