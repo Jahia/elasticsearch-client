@@ -28,11 +28,11 @@ public class ESIndicesListCommand extends AbstractESCommand {
         table.column(new Col("Index"));
         table.column(new Col("Aliases"));
 
-        for (Map.Entry<String, String> index : indexes.entrySet()) {
+        indexes.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(index -> {
             final Row row = table.addRow();
             row.addContent(index.getKey());
             row.addContent(index.getValue());
-        }
+        });
         table.print(System.out, true);
 
         return null;
