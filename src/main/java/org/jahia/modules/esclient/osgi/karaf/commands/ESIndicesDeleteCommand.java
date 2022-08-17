@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Command(scope = "es", name = "indices-delete", description = "Deletes some ES indices")
@@ -20,7 +21,7 @@ public class ESIndicesDeleteCommand extends AbstractESCommand {
 
     private static final Logger logger = LoggerFactory.getLogger(ESIndicesDeleteCommand.class);
     private static final String DELETE_ALL = "delete-all";
-    private static final String PREFIX = "prefix";
+    private static final String REGEX = "regex";
     private static final String EXACT_MATCH = "exact-match";
 
     @Argument(description = "Indices to delete", required = true, multiValued = true)
@@ -33,38 +34,48 @@ public class ESIndicesDeleteCommand extends AbstractESCommand {
 
         final Map<String, List<String>> deletionPatterns = indices.stream().collect(Collectors.groupingBy(s -> {
             if (StringUtils.equals(s, "*")) return DELETE_ALL;
-            if (StringUtils.endsWith(s, "*")) return PREFIX;
+            if (StringUtils.contains(s, '*')) return REGEX;
             return EXACT_MATCH;
         }));
-        if (deletionPatterns.containsKey(PREFIX))
-            deletionPatterns.put(PREFIX, deletionPatterns.get(PREFIX).stream().
-                    map(s -> StringUtils.substring(s, 0, s.length()-1)).collect(Collectors.toList()));
+        List<Pattern> patterns = null;
+        if (deletionPatterns.containsKey(REGEX))
+            patterns = deletionPatterns.get(REGEX).stream()
+                    .map(s -> Pattern.compile(StringUtils.replace(Pattern.quote(s), "*", ".+")))
+                    .collect(Collectors.toList());
+
 
         final ESService esService = getESService();
+        boolean currentIndexDeleted;
         for (String index : esService.listIndices().keySet()) {
+            currentIndexDeleted = false;
             if (deletionPatterns.containsKey(DELETE_ALL)) {
-                removeIndex(index, esService);
+                currentIndexDeleted = removeIndex(index, esService);
                 continue;
             }
-            if (deletionPatterns.containsKey(PREFIX)) {
-                for (String p : deletionPatterns.get(PREFIX)) {
-                    if (StringUtils.startsWith(index, p)) {
-                        removeIndex(index, esService);
-                        continue;
+            if (patterns != null) {
+                for (Pattern p : patterns) {
+                    if (p.matcher(index).matches()) {
+                        currentIndexDeleted = removeIndex(index, esService);
+                        break;
                     }
                 }
+                if (currentIndexDeleted) continue;
             }
             if (deletionPatterns.containsKey(EXACT_MATCH) && deletionPatterns.get(EXACT_MATCH).contains(index)) {
-                removeIndex(index, esService);
-                continue;
+                currentIndexDeleted = removeIndex(index, esService);
             }
         }
 
         return null;
     }
 
-    private void removeIndex(String index, ESService esService) {
-        if (esService.removeIndex(index)) System.out.println("Deleted " + index);
-        else System.out.println("Failed to delete " + index);
+    private boolean removeIndex(String index, ESService esService) {
+        if (esService.removeIndex(index)) {
+            System.out.println("Deleted " + index);
+            return true;
+        } else {
+            System.out.println("Failed to delete " + index);
+            return false;
+        }
     }
 }
