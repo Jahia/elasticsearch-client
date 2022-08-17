@@ -44,7 +44,7 @@ public class ESIndicesDeleteCommand extends AbstractESCommand {
         List<Pattern> patterns = null;
         if (deletionPatterns.containsKey(REGEX))
             patterns = deletionPatterns.get(REGEX).stream()
-                    .map(s -> Pattern.compile(StringUtils.replace(Pattern.quote(s), "*", ".+")))
+                    .map(s -> Pattern.compile(StringUtils.replace(Pattern.quote(s), "*", "\\E.+\\Q")))
                     .collect(Collectors.toList());
 
 
