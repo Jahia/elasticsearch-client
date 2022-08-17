@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.karaf.shell.api.action.Argument;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Completion;
+import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.jahia.modules.esclient.osgi.karaf.completers.IndicesCompleter;
 import org.jahia.modules.esclient.services.ESService;
@@ -23,6 +24,9 @@ public class ESIndicesDeleteCommand extends AbstractESCommand {
     private static final String DELETE_ALL = "delete-all";
     private static final String REGEX = "regex";
     private static final String EXACT_MATCH = "exact-match";
+
+    @Option(name = "-s", aliases = "--simulate", description = "If true, do not proceed with the actual deletion, only log the name of the indices which would be deleted")
+    boolean simulate;
 
     @Argument(description = "Indices to delete", required = true, multiValued = true)
     @Completion(IndicesCompleter.class)
@@ -49,33 +53,39 @@ public class ESIndicesDeleteCommand extends AbstractESCommand {
         for (String index : esService.listIndices().keySet()) {
             currentIndexDeleted = false;
             if (deletionPatterns.containsKey(DELETE_ALL)) {
-                currentIndexDeleted = removeIndex(index, esService);
+                removeIndex(index, esService);
+                currentIndexDeleted = true;
                 continue;
             }
             if (patterns != null) {
                 for (Pattern p : patterns) {
                     if (p.matcher(index).matches()) {
-                        currentIndexDeleted = removeIndex(index, esService);
+                        removeIndex(index, esService);
+                        currentIndexDeleted = true;
                         break;
                     }
                 }
                 if (currentIndexDeleted) continue;
             }
             if (deletionPatterns.containsKey(EXACT_MATCH) && deletionPatterns.get(EXACT_MATCH).contains(index)) {
-                currentIndexDeleted = removeIndex(index, esService);
+                removeIndex(index, esService);
+                currentIndexDeleted = true;
             }
         }
 
         return null;
     }
 
-    private boolean removeIndex(String index, ESService esService) {
+    private void removeIndex(String index, ESService esService) {
+        if (simulate) {
+            System.out.println(String.format("Would delete %s", index));
+            return;
+        }
+
         if (esService.removeIndex(index)) {
             System.out.println("Deleted " + index);
-            return true;
         } else {
             System.out.println("Failed to delete " + index);
-            return false;
         }
     }
 }
