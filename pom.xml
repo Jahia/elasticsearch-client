@@ -61,7 +61,7 @@
         <jahia-depends>default,database-connector,elasticsearch-connector</jahia-depends>
         <database-connector.version>1.3.0</database-connector.version>
         <elasticsearch-connector.version>3.0.0</elasticsearch-connector.version>
-        <jahia-module-signature>MCwCFAz8HyH1BkJVhD9JKzNY4pH2jzrxAhQG2Xc/ORMJafT8AgeZfQj+ZOmJmw==</jahia-module-signature>
+        <jahia-module-signature>MCwCFAwfEXG0k4BZN66I+GFzLRZVIWtOAhR+FgAeRhtxTBB7qfLfRYGZm4V3UQ==</jahia-module-signature>
     </properties>
 
     <scm>
